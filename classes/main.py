@@ -4,14 +4,22 @@
 import pygame
 from .manoir import Manoir
 from .joueur import Joueur
+from .inventaire import Inventaire
+
+
+PANNEAU_LARGEUR = 260
 
 def main():
     pygame.init()
-
+    inventaire = Inventaire()
     manoir = Manoir()
     joueur = Joueur(pos_depart=manoir.pos_entree)
+    
+    
+    # largeur totale = largeur grille + panneau
 
-    fenetre = pygame.display.set_mode((manoir.largeur, manoir.hauteur))
+    #fenetre = pygame.display.set_mode((manoir.largeur, manoir.hauteur))
+    fenetre = pygame.display.set_mode((manoir.largeur + PANNEAU_LARGEUR, manoir.hauteur))
     pygame.display.set_caption("Blue Prince - Prototype")
 
     clock = pygame.time.Clock()
@@ -35,6 +43,7 @@ def main():
 
         # --- rendu ---
         manoir.dessiner_grille(fenetre)
+        manoir.dessiner_panneau(fenetre,inventaire)
         joueur.dessiner(fenetre)
         pygame.display.flip()
         clock.tick(60)
