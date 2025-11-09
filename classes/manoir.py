@@ -1,5 +1,16 @@
 # classes/manoir.py
 import pygame
+from .rooms.base import Dir  # ← tu as déjà Dir dans pieces/base.py
+
+# (tes constantes...)
+
+# Table des vecteurs par direction
+DIR_VEC = {
+    Dir.UP:    (-1, 0),
+    Dir.DOWN:  ( 1, 0),
+    Dir.LEFT:  ( 0,-1),
+    Dir.RIGHT: ( 0, 1),
+}
 
 # --------- constantes (grille + couleurs) ----------
 LIGNES= 9   
@@ -116,3 +127,23 @@ class Manoir:
                 surf = self.font_texte.render(li, True, COUL_TEXTE)
                 surface.blit(surf, (x0 + 16, y))
                 y += 28
+                
+    def in_bounds(self, i:int, j:int) -> bool:
+        #Évite les IndexError quand on sort de la grille (ex: i = -1 ou j = COLONNES).
+        return 0 <= i < self.lignes and 0 <= j < self.colonnes
+    
+    def can_move(self, i:int, j:int, d: Dir) -> tuple[bool, tuple[int,int] | None, str]:
+        """
+        V1 simple : on autorise le déplacement si la SALLE COURANTE a une porte côté d.
+        On ne vérifie PAS la case voisine (qu'elle soit vide ou non).
+        """
+        cur = self.grille[i][j]
+        if cur is None:
+            return (False, None, "Pas de salle sous le joueur.")
+        if not cur.a_porte(d):
+            return (False, None, "Pas de porte dans cette direction.")
+        di, dj = DIR_VEC[d]
+        ni, nj = i + di, j + dj
+        if not self.in_bounds(ni, nj):
+            return (False, None, "Hors de la grille.")
+        return (True, (ni, nj), "")

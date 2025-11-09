@@ -1,7 +1,6 @@
 # classes/pieces/base.py
 from enum import Enum
 from dataclasses import dataclass
-from typing import Optional
 
 class Dir(Enum):
     UP="U"; DOWN="D"; LEFT="L"; RIGHT="R"

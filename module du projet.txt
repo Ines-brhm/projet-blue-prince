@@ -1,0 +1,17 @@
+projet-blue-prince/
+└─ classes/
+   ├─ main.py
+   ├─ manoir.py
+   ├─ joueur.py
+   ├─ inventaire.py
+   └─ pieces/
+      ├─ __init__.py         # rassemble tout + fonctions utilitaires
+      ├─ base.py             # Dir + Piece (classe commune ultra simple)
+      ├─ bleues.py           # pieces bleues  (PIECES = [...])
+      ├─ jaunes.py           # pièces jaunes  (magasins)
+      ├─ vertes.py           # pièces vertes  (jardins)
+      ├─ violettes.py        # pièces violettes (chambres)
+      ├─ oranges.py          # couloirs
+      ├─ rouges.py           # pénalités
+      └─ tirage.py           # fonction tirer_3_pieces(...)
+
