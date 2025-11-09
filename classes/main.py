@@ -5,6 +5,7 @@ import pygame
 from .manoir import Manoir
 from .joueur import Joueur
 from .inventaire import Inventaire
+from .rooms.blue_rooms import SalleBleueCommune  # ou ta salle
 
 
 PANNEAU_LARGEUR = 260
@@ -15,6 +16,14 @@ def main():
     manoir = Manoir()
     joueur = Joueur(pos_depart=manoir.pos_entree)
     
+    # 1) créer l'instance de salle
+    start_room = SalleBleueCommune()  # les () sont importants
+
+    # 2) récupérer la case d'entrée
+    i, j = manoir.pos_entree  # (ligne, colonne)
+
+    # 3) poser la salle UNE FOIS
+    manoir.grille[i][j] = start_room
     
     # largeur totale = largeur grille + panneau
 
