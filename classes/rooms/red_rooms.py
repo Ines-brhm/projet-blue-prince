@@ -54,3 +54,37 @@ class Chapel(BaseSalle):
                 gain = random.choice(self._gold_piles)
                 inv.gold = getattr(inv, "gold", 0) + gain
                 print(f"🪙 Chapel: +{gain} or")
+
+
+class WeightRoom(BaseSalle):
+    """
+    Red Room — Steps perdus au DRAFT (pas à l'entrée) :
+    - Au moment où la salle est draftée/placée, on retire floor(steps/2).
+    - Loot occasionnel : +3 Gold.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Weight Room",
+            couleur="red",
+            portes={Dir.UP: Door(0),Dir.DOWN: Door(0)},  # ajuste si besoin
+            image=os.path.join(ASSETS_RED, "Weight_Room_Icon.png"),
+            cout_gemmes=0,
+            rarity=0,
+        )
+        self.draftable = True
+        self._loot_chance = 0.25  # 25% ≈ tu peux changer
+
+    # ---- Spécifique : effet au DRAFT (pas à l'entrée) ----
+    def on_enter(self, joueur, manoir):
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        cur = getattr(inv, "steps", 0)
+        perte = cur // 2  # floor
+        inv.steps = max(0, cur - perte)
+
+        # loot occasionnel : +3 gold
+        if random.random() < self._loot_chance:
+            inv.gold = getattr(inv, "gold", 0) + 3
+            print("🏋️ Weight Room: +3 Gold (draft loot)")
