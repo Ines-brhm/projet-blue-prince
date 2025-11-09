@@ -2,11 +2,11 @@
 import random
 from .rooms.purple_rooms import Bedroom
 from .rooms.red_rooms import Chapel  # adapte le nom si ton fichier s'appelle autrement
-
+from .rooms.blue_rooms import Garage
 # --- Pioche : usines qui créent une NOUVELLE instance à chaque tirage ---
 FACTORIES = [
     lambda: Bedroom(),
-    lambda: Chapel(),
+    lambda: Garage(),
 ]
 
 def piocher_room():

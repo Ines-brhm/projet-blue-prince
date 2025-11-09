@@ -5,6 +5,7 @@ class Inventaire:
         self.gems = 2
         self.keys = 0
         self.dice = 0
+        self.shovel=0
 
     def depenser_step(self) -> bool:
         if self.steps <= 0: return False

@@ -1,6 +1,7 @@
 # classes/pieces/bleues.py
 from .base import BaseSalle, Dir, Door
 import os
+import random
 
 ASSETS_BLUE = os.path.join("classes","rooms","assets", "blue")
 
@@ -42,3 +43,41 @@ class EntranceHall(BaseSalle):
             self._blueprint_donne = True
             # Affichage console (en attendant un UI/HUD)
             print("📜 Blueprint obtenu : vous pouvez drafter des rooms.")"""
+            
+            
+class Garage(BaseSalle):
+    """
+    Blue Room — Dead End (cul-de-sac).
+    - 1 seule porte (par ex. UP).
+    - 1ère entrée: +3 Keys (porte-clés près de l'entrée).
+    - Loot occasionnel: Shovel (pelle).
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Garage",
+            couleur="blue",
+            portes={Dir.UP: Door(0), Dir.DOWN: Door(0)},                 # cul-de-sac : une seule sortie ; change UP si besoin
+            image=os.path.join(ASSETS_BLUE, "Garage_Icon.png"),
+            cout_gemmes=0,
+            rarity=0,
+        )
+        self.draftable = True
+        self._keys_given = False
+        self._loot_chance = 0.25  # ~25% de chance d'obtenir la pelle
+
+    def on_enter(self, joueur, manoir) -> None:
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        # 3 clés une seule fois (à la 1ère entrée)
+        if not self._keys_given:
+            inv.keys = getattr(inv, "keys", 0) + 3
+            self._keys_given = True
+            print("🔑 Garage: +3 Keys")
+
+        # Loot occasionnel : Shovel
+        if random.random() < self._loot_chance:
+            if not getattr(inv,"shovel",0):
+                inv.shovel = getattr(inv, "shovel", 0) + 1
+                print("🛠️ Garage: found Shovel")

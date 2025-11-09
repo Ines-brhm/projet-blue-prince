@@ -121,6 +121,7 @@ class Manoir:
                 f"Gems  : {inventaire.gems}",
                 f"Keys  : {inventaire.keys}",
                 f"Dice  : {inventaire.dice}",
+                f"shovel  : {inventaire.shovel}",
             ]
             y = 60
             for li in lignes:
