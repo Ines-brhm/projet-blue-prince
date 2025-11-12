@@ -4,13 +4,18 @@ from .manoir import Manoir
 from .joueur import Joueur
 from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall  # ta room de départ
-from .tirage import ensure_room_and_trigger  # <--- AJOUT
+from .tirage import ensure_room_and_trigger ,attend_choix_joueur # <--- AJOUT
 
-PANNEAU_LARGEUR = 260
+PANNEAU_LARGEUR = 500
 
 def main():
     pygame.init()
 
+    # état global
+    mode_draft = False
+    draft_choices = []
+    draft_selected = 0
+    
     inventaire = Inventaire()
     manoir = Manoir()
     joueur = Joueur(pos_depart=manoir.pos_entree)
@@ -41,12 +46,37 @@ def main():
                     en_cours = False
                 # ZQSD → déplacement via can_move (portes)
                 elif event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d):
+                    # après un déplacement réussi :
                     if joueur.deplacer_key(manoir, event.key):
-                        ensure_room_and_trigger(manoir, joueur)  # ← poser si vide + on_enter
-                    
+                        choix = attend_choix_joueur(manoir, joueur)
+                        if choix:                    # case vide -> on propose 3 rooms
+                            draft_choices = choix
+                            draft_selected = 0
+                            mode_draft = True
+                        else:
+                            # case déjà occupée -> on_enter si tu veux
+                            room = manoir.grille[joueur.i][joueur.j]
+                            if hasattr(room, "on_enter"): room.on_enter(joueur, manoir)
+
+                    # gestion des touches en mode draft
+                    elif event.type == pygame.KEYDOWN and mode_draft:
+                        if event.key == pygame.K_q:
+                            draft_selected = (draft_selected - 1) % len(draft_choices)
+                        elif event.key == pygame.K_d:
+                            draft_selected = (draft_selected + 1) % len(draft_choices)
+                        elif event.key in (pygame.K_s, pygame.K_KP_ENTER): 
+                            i, j = joueur.i, joueur.j
+                            choix = draft_choices[draft_selected]
+                            if hasattr(choix, "on_draft"): choix.on_draft(joueur, manoir)
+                            manoir.grille[i][j] = choix
+                            if hasattr(choix, "on_enter"): choix.on_enter(joueur, manoir)
+                            mode_draft = False
+                            draft_choices = []
         # --- rendu ---
         manoir.dessiner_grille(fenetre)
         manoir.dessiner_panneau(fenetre, inventaire)
+        if mode_draft and draft_choices:
+            manoir.dessiner_draft_choices(fenetre, draft_choices, draft_selected)
         joueur.dessiner(fenetre)
 
         pygame.display.flip()

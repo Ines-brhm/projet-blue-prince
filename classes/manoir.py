@@ -30,6 +30,13 @@ COUL_PANNEAU    = (30, 33, 45)
 COUL_TEXTE      = (235, 235, 240)
 COUL_TITRE      = (180, 200, 255)
 
+
+# --- zone "draft" en bas du panneau inventaire ---
+CHOIX_TAILLE   = 110      # taille de la vignette (carré)
+CHOIX_ESPACE   = 18       # espace horizontal entre cartes
+DRAFT_MARGE    = 16       # marge intérieure du panneau
+DRAFT_TITRE_H  = 28       # hauteur pour le titre "Choose a room"
+
 class Manoir:
     """Grille 5x9 du manoir + entrée en bas-centre + dessin Pygame."""
     def __init__(self):
@@ -148,3 +155,76 @@ class Manoir:
         if not self.in_bounds(ni, nj):
             return (False, None, "Hors de la grille.")
         return (True, (ni, nj), "")
+    
+    
+    def _get_thumb(self, path: str, size: int = CHOIX_TAILLE):
+        """Charge une image et la met au format vignette."""
+        if not path:
+            return None
+    # on réutilise le cache de _get_img mais on rescale si besoin
+        surf = self._get_img(path)
+        if surf is None: 
+            return None
+        if surf.get_width() != size or surf.get_height() != size:
+            surf = pygame.transform.smoothscale(surf, (size, size))
+        return surf
+    
+    def dessiner_draft_choices(self, surface: pygame.Surface, rooms: list, selected_idx: int = 0):
+        """
+        Affiche 3 rooms (tirées) en bas du panneau inventaire, avec un surlignage
+        pour l’élément sélectionné. Retourne la liste des pygame.Rect des cartes.
+        """
+        # géométrie de la zone "draft" (dans le panneau à droite)
+        x_pan = self.largeur +100
+        y_zone = self.hauteur - (DRAFT_MARGE + CHOIX_TAILLE + DRAFT_TITRE_H +100)
+        w_zone = PANNEAU_LARGEUR
+        h_zone = DRAFT_MARGE + CHOIX_TAILLE + DRAFT_TITRE_H + 100
+
+        # fond léger de la zone
+        zone_rect = pygame.Rect(x_pan, y_zone, w_zone, h_zone)
+        pygame.draw.rect(surface, (0, 0, 0), zone_rect)
+
+        # titre
+        titre = self.font_texte.render("Choose a room to draft", True, COUL_TITRE)
+        surface.blit(titre, (x_pan + DRAFT_MARGE, y_zone + 6))
+
+        # positionnement des 3 vignettes
+        n = min(3, len(rooms))
+        if n == 0:
+            return []
+
+        total_w = n * CHOIX_TAILLE + (n - 1) * CHOIX_ESPACE
+        x0 = x_pan + (w_zone - total_w) // 2
+        y0 = y_zone + DRAFT_TITRE_H + 10
+
+        card_rects = []
+        for i in range(n):
+            room = rooms[i]
+            rx = x0 + i * (CHOIX_TAILLE + CHOIX_ESPACE)
+            ry = y0
+            card = pygame.Rect(rx, ry, CHOIX_TAILLE, CHOIX_TAILLE)
+            card_rects.append(card)
+
+            # cadre (surlignage si sélectionné)
+            border = 4 if i == selected_idx else 1
+            border_color = (235, 235, 240) if i == selected_idx else COUL_GRILLE
+            pygame.draw.rect(surface, COUL_CASE_VIDE, card, border_radius=10)
+            pygame.draw.rect(surface, border_color, card, width=border, border_radius=10)
+
+            # image
+            img = self._get_thumb(getattr(room, "image", None), CHOIX_TAILLE - 8)
+            if img:
+                # centre l’image dans la carte
+                ix = rx + (CHOIX_TAILLE - img.get_width()) // 2
+                iy = ry + (CHOIX_TAILLE - img.get_height()) // 2
+                surface.blit(img, (ix, iy))
+            else:
+                # fallback : badge couleur + nom
+                pygame.draw.rect(surface, (60, 62, 74), card.inflate(-12, -12), border_radius=8)
+                nom = getattr(room, "nom", "Room")
+                txt = self.font_texte.render(nom, True, COUL_TEXTE)
+                tx = rx + (CHOIX_TAILLE - txt.get_width()) // 2
+                ty = ry + (CHOIX_TAILLE - txt.get_height()) // 2
+                surface.blit(txt, (tx, ty))
+
+        return card_rects
