@@ -16,7 +16,7 @@ class Chapel(BaseSalle):
         super().__init__(
             nom="Chapel",
             couleur="red",
-            portes={Dir.UP: Door(0),Dir.DOWN: Door(0)},                 # ajustable : {Dir.UP:Door(0), Dir.LEFT:Door(0)}...
+            portes={Dir.RIGHT: Door(0), Dir.LEFT: Door(0),Dir.DOWN: Door(0)},                 # ajustable : {Dir.UP:Door(0), Dir.LEFT:Door(0)}...
             image=os.path.join(ASSETS_RED, "Chapel_Icon.png"),
             cout_gemmes=0,
             rarity=0,
@@ -66,7 +66,7 @@ class WeightRoom(BaseSalle):
         super().__init__(
             nom="Weight Room",
             couleur="red",
-            portes={Dir.UP: Door(0),Dir.DOWN: Door(0)},  # ajuste si besoin
+            portes={Dir.UP: Door(0),Dir.LEFT: Door(0),Dir.RIGHT: Door(0),Dir.DOWN: Door(0)},  # ajuste si besoin
             image=os.path.join(ASSETS_RED, "Weight_Room_Icon.png"),
             cout_gemmes=0,
             rarity=0,

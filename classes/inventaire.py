@@ -1,6 +1,6 @@
 class Inventaire:
     def __init__(self):
-        self.steps = 70
+        self.steps = 700
         self.gold = 0
         self.gems = 2
         self.keys = 0

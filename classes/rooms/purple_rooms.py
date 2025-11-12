@@ -16,7 +16,7 @@ class Bedroom(BaseSalle):
         super().__init__(
             nom="Bedroom",
             couleur="violet",
-            portes={Dir.UP: Door(0),Dir.DOWN: Door(0)},  # ajoute LEFT/RIGHT si tu veux
+            portes={Dir.LEFT: Door(0),Dir.DOWN: Door(0)},  # ajoute LEFT/RIGHT si tu veux
             image=os.path.join(ASSETS_PURPLE, "Bedroom_Icon.png"),
             cout_gemmes=0,
             rarity=0,

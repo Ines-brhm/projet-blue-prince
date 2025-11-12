@@ -67,6 +67,7 @@ def main():
                         elif event.key in (pygame.K_s, pygame.K_KP_ENTER): 
                             i, j = joueur.i, joueur.j
                             choix = draft_choices[draft_selected]
+                            print(choix.portes) # ligne pour verifier si les porte sont bien prise en compte
                             if hasattr(choix, "on_draft"): choix.on_draft(joueur, manoir)
                             manoir.grille[i][j] = choix
                             if hasattr(choix, "on_enter"): choix.on_enter(joueur, manoir)

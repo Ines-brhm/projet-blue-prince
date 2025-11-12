@@ -56,7 +56,7 @@ class Garage(BaseSalle):
         super().__init__(
             nom="Garage",
             couleur="blue",
-            portes={Dir.UP: Door(0), Dir.DOWN: Door(0)},                 # cul-de-sac : une seule sortie ; change UP si besoin
+            portes={Dir.DOWN: Door(0)},                 # cul-de-sac : une seule sortie ; change UP si besoin
             image=os.path.join(ASSETS_BLUE, "Garage_Icon.png"),
             cout_gemmes=0,
             rarity=0,
