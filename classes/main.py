@@ -4,7 +4,7 @@ from .manoir import Manoir
 from .joueur import Joueur
 from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall  # ta room de départ
-from .tirage import ensure_room_and_trigger ,attend_choix_joueur # <--- AJOUT
+from .tirage import attend_choix_joueur # <--- AJOUT
 
 PANNEAU_LARGEUR = 500
 
