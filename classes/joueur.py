@@ -15,15 +15,18 @@ KEY_TO_DIR = {
 class Joueur:
     def __init__(self, pos_depart=None):
         self.i, self.j = pos_depart if pos_depart is not None else (0, 0)
-
+        self.i_1,self.j_1= pos_depart
+        self.last_dir : dict
     def deplacer_dir(self, manoir, d: Dir) -> bool:
         if d is None:
             return False
 
-        ok, dest, _ = manoir.can_move(self.i, self.j, d)
+        ok, dest, last_dir = manoir.can_move(self.i, self.j, d)
+
         if not ok:
             return False
-
+        if ok:
+            self.last_dir=d
         # --- consommer 1 pas AVANT de se déplacer ---
         inv = getattr(self, "inv", None)
         if inv is None:
@@ -34,7 +37,8 @@ class Joueur:
             return False  # plus de pas => pas de déplacement
 
         inv.steps -= 1  # OK on consomme 1 pas
-
+        #garder la derniere pos
+        
         # déplacer le joueur
         self.i, self.j = dest
         return True

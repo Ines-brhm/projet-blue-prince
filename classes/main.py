@@ -3,82 +3,97 @@ import pygame
 from .manoir import Manoir
 from .joueur import Joueur
 from .inventaire import Inventaire
-from .rooms.blue_rooms import EntranceHall  # ta room de départ
-from .tirage import attend_choix_joueur # <--- AJOUT
+from .rooms.blue_rooms import EntranceHall
+from .tirage import attend_choix_joueur
 
 PANNEAU_LARGEUR = 500
 
 def main():
     pygame.init()
 
-    # état global
-    mode_draft = False
-    draft_choices = []
-    draft_selected = 0
-    
-    inventaire = Inventaire()
+    # État UI du draft
+    mode_draft     = False
+    draft_choices  = []   # liste de 3 rooms
+    draft_selected = 0    # index sélectionné (0..2)
+
+    inv    = Inventaire()
     manoir = Manoir()
     joueur = Joueur(pos_depart=manoir.pos_entree)
-    joueur.inv=inventaire
+    joueur.inv = inv
 
-    # 1) Créer l'instance de la salle de départ
-    start_room = EntranceHall()  
+    # Salle de départ posée une fois
+    i0, j0 = manoir.pos_entree
+    manoir.grille[i0][j0] = EntranceHall()
 
-    # 2) Récupérer la case d'entrée
-    i, j = manoir.pos_entree  # (ligne, colonne)
-
-    # 3) Poser la salle UNE FOIS sur la case d’entrée
-    manoir.grille[i][j] = start_room
-
-    # Fenêtre = grille + panneau à droite
-    fenetre = pygame.display.set_mode((manoir.largeur + PANNEAU_LARGEUR, manoir.hauteur))
+    # Fenêtre
+    fen = pygame.display.set_mode((manoir.largeur + PANNEAU_LARGEUR, manoir.hauteur))
     pygame.display.set_caption("Blue Prince - Prototype")
 
     clock = pygame.time.Clock()
-    en_cours = True
-    while en_cours:
-        # --- événements ---
+    running = True
+    while running:
+        # ----------------- ÉVÉNEMENTS -----------------
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                en_cours = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    en_cours = False
-                # ZQSD → déplacement via can_move (portes)
-                elif event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d):
-                    # après un déplacement réussi :
-                    if joueur.deplacer_key(manoir, event.key):
-                        choix = attend_choix_joueur(manoir, joueur)
-                        if choix:                    # case vide -> on propose 3 rooms
-                            draft_choices = choix
-                            draft_selected = 0
-                            mode_draft = True
-                        else:
-                            # case déjà occupée -> on_enter si tu veux
-                            room = manoir.grille[joueur.i][joueur.j]
-                            if hasattr(room, "on_enter"): room.on_enter(joueur, manoir)
+                running = False
+                continue
 
-                    # gestion des touches en mode draft
-                    elif event.type == pygame.KEYDOWN and mode_draft:
-                        if event.key == pygame.K_q:
-                            draft_selected = (draft_selected - 1) % len(draft_choices)
-                        elif event.key == pygame.K_d:
-                            draft_selected = (draft_selected + 1) % len(draft_choices)
-                        elif event.key in (pygame.K_s, pygame.K_KP_ENTER): 
-                            i, j = joueur.i, joueur.j
-                            choix = draft_choices[draft_selected]
-                            print(choix.portes) # ligne pour verifier si les porte sont bien prise en compte
-                            if hasattr(choix, "on_draft"): choix.on_draft(joueur, manoir)
+            if event.type == pygame.KEYDOWN:
+                # ESC quitte toujours
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                    continue
+
+                if mode_draft:
+                    # -------- Mode draft : SEULES flèches + Enter sont prises en compte --------
+                    if event.key == pygame.K_LEFT:
+                        draft_selected = (draft_selected - 1) % len(draft_choices)
+                    elif event.key == pygame.K_RIGHT:
+                        draft_selected = (draft_selected + 1) % len(draft_choices)
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+                        i, j = joueur.i, joueur.j
+                        choix = draft_choices[draft_selected]
+
+                        # poser la room (en respectant orientation si tu as la méthode)
+                        if hasattr(manoir, "place_room_oriented"):
+                            manoir.place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None))
+                        else:
                             manoir.grille[i][j] = choix
-                            if hasattr(choix, "on_enter"): choix.on_enter(joueur, manoir)
-                            mode_draft = False
-                            draft_choices = []
-        # --- rendu ---
-        manoir.dessiner_grille(fenetre)
-        manoir.dessiner_panneau(fenetre, inventaire)
+
+                        # effet d'entrée
+                        if hasattr(choix, "on_enter"):
+                            choix.on_enter(joueur, manoir)
+
+                        # sortir du mode draft
+                        mode_draft = False
+                        draft_choices = []
+                        draft_selected = 0
+
+                    # TOUTES les autres touches sont ignorées en mode draft
+                    continue
+
+                # -------- Mode normal : déplacements (ZQSD + flèches si tu veux) --------
+                if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT):
+                    moved = joueur.deplacer_key(manoir, event.key)
+                    if moved:
+                        # Si la case est vide : proposer 3 rooms
+                        choix = attend_choix_joueur(manoir, joueur)
+                        if choix:
+                            draft_choices  = choix
+                            draft_selected = 0
+                            mode_draft     = True
+                        else:
+                            # Case déjà occupée → déclencher l'effet au besoin
+                            r = manoir.grille[joueur.i][joueur.j]
+                            if hasattr(r, "on_enter"):
+                                r.on_enter(joueur, manoir)
+
+        # ----------------- RENDU -----------------
+        manoir.dessiner_grille(fen)
+        manoir.dessiner_panneau(fen, inv)
         if mode_draft and draft_choices:
-            manoir.dessiner_draft_choices(fenetre, draft_choices, draft_selected)
-        joueur.dessiner(fenetre)
+            manoir.dessiner_draft_choices(fen, draft_choices, draft_selected)
+        joueur.dessiner(fen)
 
         pygame.display.flip()
         clock.tick(60)

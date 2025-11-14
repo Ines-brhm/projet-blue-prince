@@ -91,6 +91,12 @@ class Manoir:
                 if salle is not None:
                     # 1) Case occupée par une salle → affiche d’abord l’image si présente, sinon couleur par type
                     img = self._get_img(getattr(salle, "image", None))
+                    rot = getattr(salle, "rot", 0)
+                    if img and rot:
+                        # rotation horaire 90° => angle négatif en pygame.rotate
+                        img = pygame.transform.rotate(img, -90 * rot)
+                        # on rescale pour rentrer proprement dans la case
+                        img = pygame.transform.smoothscale(img, (w, h))
                     if img:
                         # petit fond discret
                         pygame.draw.rect(surface, COUL_CASE_VIDE, rect, border_radius=10)
@@ -182,7 +188,7 @@ class Manoir:
 
         # fond léger de la zone
         zone_rect = pygame.Rect(x_pan, y_zone, w_zone, h_zone)
-        pygame.draw.rect(surface, (0, 0, 0), zone_rect)
+        pygame.draw.rect(surface, (25, 27, 37), zone_rect)
 
         # titre
         titre = self.font_texte.render("Choose a room to draft", True, COUL_TITRE)
@@ -228,3 +234,50 @@ class Manoir:
                 surface.blit(txt, (tx, ty))
 
         return card_rects
+
+
+    # --- helpers directions (simples, locaux à Manoir) ---
+    def _opp(self, d):
+        return {Dir.UP:Dir.DOWN, Dir.DOWN:Dir.UP, Dir.LEFT:Dir.RIGHT, Dir.RIGHT:Dir.LEFT}[d]
+
+    def _rot90_dir(self, d):
+        return {Dir.UP:Dir.RIGHT, Dir.RIGHT:Dir.DOWN, Dir.DOWN:Dir.LEFT, Dir.LEFT:Dir.UP}[d]
+
+    def _door_would_exit(self, i, j, d) -> bool:
+        return ((i == 0 and d == Dir.UP) or
+                (i == self.lignes-1 and d == Dir.DOWN) or
+                (j == 0 and d == Dir.LEFT) or
+                (j == self.colonnes-1 and d == Dir.RIGHT))
+
+    # 1) Tourner la salle de 90° horaire
+    def rotate_room_once(self, room) -> None:
+        from .rooms.base import Door
+        new_portes = {}
+        for d, door in room.portes.items():
+            nd = self._rot90_dir(d)
+            new_portes[nd] = Door(door.level)
+        room.portes = new_portes
+        room.rot = (room.rot + 1) % 4 
+
+    # 2) Tester l’orientation (True/False)
+    def is_room_orientation_ok(self, room, i:int, j:int, came_from_dir) -> bool:
+        # a) pas de porte qui sort
+        for d in room.portes.keys():
+            if self._door_would_exit(i, j, d):
+                return False
+        # b) porte retour requise si on connaît la direction d’arrivée
+        if came_from_dir is not None:
+            need = self._opp(came_from_dir)  # ex: si on est venu par RIGHT, il faut LEFT
+            if need not in room.portes:
+                return False
+        return True
+
+    # 3) Essayer jusqu’à 4 rotations puis placer
+    def place_room_oriented(self, room, i:int, j:int, came_from_dir) -> bool:
+        for _ in range(4):
+            if self.is_room_orientation_ok(room, i, j, came_from_dir):
+                self.grille[i][j] = room
+                return True
+            self.rotate_room_once(room)
+        return False  # après 4 rotations, tjrs pas bon → re-tirer
+

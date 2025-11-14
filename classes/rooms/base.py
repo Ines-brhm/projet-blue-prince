@@ -27,6 +27,7 @@ class BaseSalle:
         self.portes = portes
         self.cout_gemmes = cout_gemmes
         self.image = image
+        self.rot = 0 
         # Sécurise la valeur dans [0..3]
         self.rarity = max(0, min(3, int(rarity)))
 
