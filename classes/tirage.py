@@ -4,6 +4,17 @@ from .rooms.purple_rooms import Bedroom
 from .rooms.red_rooms import Chapel ,WeightRoom   # adapte le nom si ton fichier s'appelle autrement
 from .rooms.blue_rooms import Garage, Vault  
 from .rooms.base import Door  # et Dir si besoin ailleurs
+from .rooms.green_rooms import Veranda
+
+def is_border(i: int, j: int, lignes: int, colonnes: int) -> bool:
+    """Retourne True si (i, j) est sur la bordure de la grille."""
+    return (
+        i == 0
+        or i == lignes - 1
+        or j == 0
+        or j == colonnes - 1
+    )
+
 
 # --- Pioche : usines qui créent une NOUVELLE instance à chaque tirage ---
 FACTORIES = [
@@ -12,25 +23,54 @@ FACTORIES = [
     lambda: Chapel(),
     lambda: WeightRoom(),
     lambda: Vault(),
+    lambda: Veranda()
 ]
 
 
-def piocher_roomss(k: int = 3, i: int = None):
-    """
-    Tirage SANS remise (k <= nb FACTORIES), et randomisation des niveaux de portes
-    selon la rangée i (si fournie).
-    """
-    rooms = [f() for f in random.sample(FACTORIES, k)]
+# def piocher_roomss(k: int = 3, i: int = None):
+#     """
+#     Tirage SANS remise (k <= nb FACTORIES), et randomisation des niveaux de portes
+#     selon la rangée i (si fournie).
+#     Si une room a l'attribut border_only = True (green_rooms), alors :
+#     - elle n'est proposée que si la case (i, j) est sur la bordure du manoir.
+#     """
+#     rooms = [f() for f in random.sample(FACTORIES, k)]
 
+#     rooms = [randomize_doors_progress(r, i) for r in rooms]
+#     print("j'ai tiree des chambre",rooms[0].nom,rooms[1].nom,rooms[2].nom)
+#     return rooms
+
+all_rooms = [f() for f in FACTORIES]
+
+def piocher_roomss(k: int = 3, i: int = None, j: int = None, manoir=None):
+    rooms_possible = [f() for f in FACTORIES]
+
+    def is_border(ii, jj):
+        if manoir is None:
+            return True
+        L, C = manoir.lignes, manoir.colonnes
+        return ii == 0 or ii == L-1 or jj == 0 or jj == C-1
+
+    if i is not None and j is not None and manoir is not None and not is_border(i, j):
+        rooms_possible = [
+            r for r in rooms_possible
+            if not getattr(r, "border_only", False)
+        ]
+
+    rooms = random.sample(rooms_possible, k)
     rooms = [randomize_doors_progress(r, i) for r in rooms]
-    print("j'ai tiree des chambre",rooms[0].nom,rooms[1].nom,rooms[2].nom)
+    print("j'ai tiré des chambres :", ", ".join(r.nom for r in rooms))
     return rooms
+
+
+    return rooms
+ 
 
 def attend_choix_joueur(manoir, joueur):
     i, j = joueur.i, joueur.j
     if manoir.grille[i][j] is None:
         # 3 rooms tirées pour un draft
-        return piocher_roomss(3,i)  # sans doublons si possible
+        return piocher_roomss(3,i,j,manoir) #on ajoute j et manoir pour les bordures 
     return []
 
 

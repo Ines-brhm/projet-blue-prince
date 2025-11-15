@@ -315,7 +315,7 @@ class Manoir:
                 return True
             self.rotate_room_once(room)
         return False  # après 4 rotations, tjrs pas bon → re-tirer
-
+    
 
     def show_message(self, text: str, seconds: float = 3.0) -> None:
         """Active un message non-bloquant pendant `seconds`."""
