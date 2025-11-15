@@ -48,7 +48,12 @@ class Manoir:
 
         # entrée (bas-centre)
         self.pos_entree = (self.lignes - 1, self.colonnes // 2)
-
+        
+        #font pour affichage des message
+        self._msg_text = None
+        self._msg_until = 0
+        self.font_msg  = pygame.font.Font(None, 36)
+        
         # grille logique (pour plus tard)
         self.grille = [[None for _ in range(self.colonnes)] for _ in range(self.lignes)]
         # classes/manoir.py (dans __init__)
@@ -281,3 +286,40 @@ class Manoir:
             self.rotate_room_once(room)
         return False  # après 4 rotations, tjrs pas bon → re-tirer
 
+
+    def show_message(self, text: str, seconds: float = 3.0) -> None:
+        """Active un message non-bloquant pendant `seconds`."""
+        self._msg_text = str(text)
+        now = pygame.time.get_ticks()
+        self._msg_until = now + int(seconds * 1000)
+
+    def draw_message(self, surface: pygame.Surface) -> None:
+        """A appeler à CHAQUE frame (si message actif, on le rend en overlay)."""
+        if not self._msg_text:
+            return
+        if pygame.time.get_ticks() > self._msg_until:
+            # message expiré
+            self._msg_text = None
+            return
+
+        W, H = surface.get_width(), surface.get_height()
+        overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 140))  # voile semi-transparent
+        surface.blit(overlay, (0, 0))
+
+        # boîte centrale
+        pad_x, pad_y = 24, 16
+        txt = self._msg_text
+        surf = self.font_msg.render(txt, True, (235, 235, 240))
+        box_w = min(max(320, surf.get_width() + 2*pad_x), W - 40)
+        box_h = surf.get_height() + 2*pad_y
+        box_x = (W - box_w)//2
+        box_y = (H - box_h)//2
+
+        rect = pygame.Rect(box_x, box_y, box_w, box_h)
+        pygame.draw.rect(surface, (30, 33, 45), rect, border_radius=12)
+        pygame.draw.rect(surface, (180, 200, 255), rect, width=2, border_radius=12)
+
+        x = box_x + (box_w - surf.get_width())//2
+        y = box_y + (box_h - surf.get_height())//2
+        surface.blit(surf, (x, y))

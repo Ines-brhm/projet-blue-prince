@@ -96,7 +96,8 @@ def main():
         if mode_draft and draft_choices:
             manoir.dessiner_draft_choices(fen, draft_choices, draft_selected)
         joueur.dessiner(fen)
-
+        manoir.draw_message(fen)
+        
         pygame.display.flip()
         clock.tick(60)
 
