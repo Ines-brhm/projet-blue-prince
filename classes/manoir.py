@@ -153,21 +153,7 @@ class Manoir:
         #Évite les IndexError quand on sort de la grille (ex: i = -1 ou j = COLONNES).
         return 0 <= i < self.lignes and 0 <= j < self.colonnes
     
-    def can_move_v1(self, i:int, j:int, d: Dir) -> tuple[bool, tuple[int,int] | None, str]:
-        """
-        V1 simple : on autorise le déplacement si la SALLE COURANTE a une porte côté d.
-        On ne vérifie PAS la case voisine (qu'elle soit vide ou non).
-        """
-        cur = self.grille[i][j]
-        if cur is None:
-            return (False, None, "Pas de salle sous le joueur.")
-        if not cur.a_porte(d):
-            return (False, None, "Pas de porte dans cette direction.")
-        di, dj = DIR_VEC[d]
-        ni, nj = i + di, j + dj
-        if not self.in_bounds(ni, nj):
-            return (False, None, "Hors de la grille.")
-        return (True, (ni, nj), "")
+
     
     def can_move(self, i:int, j:int, d:Dir, inv=None):
         cur = self.grille[i][j]
@@ -304,18 +290,33 @@ class Manoir:
         return True,need
 
     # 3) Essayer jusqu’à 4 rotations puis placer
-    def place_room_oriented(self, room, i:int, j:int, came_from_dir) -> bool:
+    def place_room_oriented(self, room, i: int, j: int, came_from_dir) -> bool:
+        """
+        Tente de placer `room` à (i,j). On accepte si l'orientation est OK.
+        Si OK, on met le niveau de la porte **de la nouvelle room** dans la direction `need` à 0
+        (sans toucher aux autres portes de cette room).
+        """
         for _ in range(4):
-            ok,need= self.is_room_orientation_ok(room, i, j, came_from_dir)
-            #portes = getattr(room, "portes", None)
-            if ok :
-                #room.portes = {d: Door(0) for d in portes.keys()}
+            ok, need = self.is_room_orientation_ok(room, i, j, came_from_dir)
+            if ok:
+                # -- Déverrouille uniquement la porte de la nouvelle salle côté `need`
+                if need is not None:
+                    current = room.portes.get(need)
+                    # Si la room a déjà une porte côté `need`, remplace par Door(0) ;
+                    if isinstance(current, Door):
+                        if current.level != 0:
+                            room.portes[need] = Door(0)
+
+
+                # Place la room ; on ne touche pas aux autres directions/levels
                 self.grille[i][j] = room
-                print("verifie le niveau de la porte")
                 return True
+
+            # orientation pas bonne -> on tourne la salle de 90°
             self.rotate_room_once(room)
-        return False  # après 4 rotations, tjrs pas bon → re-tirer
-    
+
+        return False
+
 
     def show_message(self, text: str, seconds: float = 3.0) -> None:
         """Active un message non-bloquant pendant `seconds`."""
