@@ -5,6 +5,7 @@ from .rooms.red_rooms import Chapel ,WeightRoom   # adapte le nom si ton fichier
 from .rooms.blue_rooms import Garage, Vault  
 from .rooms.base import Door  # et Dir si besoin ailleurs
 from .rooms.green_rooms import Veranda, Terrace
+from .rooms.orange_rooms import Hallway
 
 def is_border(i: int, j: int, lignes: int, colonnes: int) -> bool:
     """Retourne True si (i, j) est sur la bordure de la grille."""
@@ -25,6 +26,7 @@ FACTORIES = [
     lambda: Vault(),
     lambda: Veranda(),
     lambda: Terrace(),
+    lambda: Hallway(),
 ]
 
 
@@ -33,25 +35,22 @@ all_rooms = [f() for f in FACTORIES]
 def piocher_roomss(k: int = 3, i: int = None, j: int = None, manoir=None):
     rooms_possible = [f() for f in FACTORIES]
 
-    def is_border(ii, jj):
-        if manoir is None:
-            return True
-        L, C = manoir.lignes, manoir.colonnes
-        return ii == 0 or ii == L-1 or jj == 0 or jj == C-1
+    
 
-    if i is not None and j is not None and manoir is not None and not is_border(i, j):
-        rooms_possible = [
-            r for r in rooms_possible
-            if not getattr(r, "border_only", False)
-        ]
+    if i is not None and j is not None and manoir is not None \
+   and not is_border(i, j, manoir.lignes, manoir.colonnes):
+
+     rooms_possible = [
+        r for r in rooms_possible
+        if not getattr(r, "border_only", False)
+]
+
 
     rooms = random.sample(rooms_possible, k)
     rooms = [randomize_doors_progress(r, i) for r in rooms]
     print("j'ai tiré des chambres :", ", ".join(r.nom for r in rooms))
     return rooms
 
-
-    return rooms
  
 
 def attend_choix_joueur(manoir, joueur):
