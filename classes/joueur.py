@@ -21,7 +21,7 @@ class Joueur:
         if d is None:
             return False
 
-        ok, dest, last_dir = manoir.can_move(self.i, self.j, d)
+        ok, dest, last_dir = manoir.can_move(self.i, self.j, d, self.inv)
 
         if not ok:
             return False

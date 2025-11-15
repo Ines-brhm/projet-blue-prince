@@ -1,7 +1,8 @@
 # classes/manoir.py
 import pygame
-from .rooms.base import Dir  # ← tu as déjà Dir dans pieces/base.py
-
+from .rooms.base import Dir  
+from .rooms.base import Door  
+from.ouverture_porte import demande_ouverture
 # (tes constantes...)
 
 # Table des vecteurs par direction
@@ -61,7 +62,8 @@ class Manoir:
         self.font_texte = pygame.font.Font(None, 24)
         
         self._img_cache = {}  # ← servira à ne pas recharger les mêmes images à chaque frame
-
+        
+        self.fenetre=0
 
     def _get_img(self, path: str):
         if not path:
@@ -151,7 +153,7 @@ class Manoir:
         #Évite les IndexError quand on sort de la grille (ex: i = -1 ou j = COLONNES).
         return 0 <= i < self.lignes and 0 <= j < self.colonnes
     
-    def can_move(self, i:int, j:int, d: Dir) -> tuple[bool, tuple[int,int] | None, str]:
+    def can_move_v1(self, i:int, j:int, d: Dir) -> tuple[bool, tuple[int,int] | None, str]:
         """
         V1 simple : on autorise le déplacement si la SALLE COURANTE a une porte côté d.
         On ne vérifie PAS la case voisine (qu'elle soit vide ou non).
@@ -167,6 +169,29 @@ class Manoir:
             return (False, None, "Hors de la grille.")
         return (True, (ni, nj), "")
     
+    def can_move(self, i:int, j:int, d:Dir, inv=None):
+        cur = self.grille[i][j]
+        if cur is None:
+            return (False, None, "Pas de salle sous le joueur.")
+        if not cur.a_porte(d):
+            return (False, None, "Pas de porte dans cette direction.")
+
+        door = cur.portes.get(d)
+        level = door.level if door else 0
+
+        if level >= 1:
+            if self.fenetre is None or inv is None:
+                return (False, None, "Porte verrouillée.")
+            ok = demande_ouverture(self.fenetre, inv, level)  # <-- utilise la même fen
+            if not ok:
+                return (False, None, "Ouverture annulée.")
+            cur.portes[d] = Door(0)
+        di, dj = DIR_VEC[d]
+        ni, nj = i + di, j + dj
+        print("les porte de cette chambre ",cur.nom ,cur.portes)
+        if not self.in_bounds(ni, nj):
+            return (False, None, "Hors de la grille.")
+        return (True, (ni, nj), "")
     
     def _get_thumb(self, path: str, size: int = CHOIX_TAILLE):
         """Charge une image et la met au format vignette."""
@@ -267,21 +292,26 @@ class Manoir:
     # 2) Tester l’orientation (True/False)
     def is_room_orientation_ok(self, room, i:int, j:int, came_from_dir) -> bool:
         # a) pas de porte qui sort
+        need= None
         for d in room.portes.keys():
             if self._door_would_exit(i, j, d):
-                return False
+                return False, need
         # b) porte retour requise si on connaît la direction d’arrivée
         if came_from_dir is not None:
             need = self._opp(came_from_dir)  # ex: si on est venu par RIGHT, il faut LEFT
             if need not in room.portes:
-                return False
-        return True
+                return False, need
+        return True,need
 
     # 3) Essayer jusqu’à 4 rotations puis placer
     def place_room_oriented(self, room, i:int, j:int, came_from_dir) -> bool:
         for _ in range(4):
-            if self.is_room_orientation_ok(room, i, j, came_from_dir):
+            ok,need= self.is_room_orientation_ok(room, i, j, came_from_dir)
+            #portes = getattr(room, "portes", None)
+            if ok :
+                #room.portes = {d: Door(0) for d in portes.keys()}
                 self.grille[i][j] = room
+                print("verifie le niveau de la porte")
                 return True
             self.rotate_room_once(room)
         return False  # après 4 rotations, tjrs pas bon → re-tirer

@@ -28,6 +28,7 @@ def main():
     # Fenêtre
     fen = pygame.display.set_mode((manoir.largeur + PANNEAU_LARGEUR, manoir.hauteur))
     pygame.display.set_caption("Blue Prince - Prototype")
+    manoir.fenetre = fen  # <--- AJOUT
 
     clock = pygame.time.Clock()
     running = True

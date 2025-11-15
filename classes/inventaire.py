@@ -3,9 +3,10 @@ class Inventaire:
         self.steps = 700
         self.gold = 0
         self.gems = 2
-        self.keys = 0
+        self.keys = 10
         self.dice = 0
         self.shovel=0
+        self.lockpicks=1
 
     def depenser_step(self) -> bool:
         if self.steps <= 0: return False
