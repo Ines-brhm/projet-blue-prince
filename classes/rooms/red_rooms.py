@@ -88,3 +88,39 @@ class WeightRoom(BaseSalle):
         if random.random() < self._loot_chance:
             inv.gold = getattr(inv, "gold", 0) + 3
             print("🏋️ Weight Room: +3 Gold (draft loot)")
+            
+class Gymnasium(BaseSalle):
+    """
+    Red Room — Gymnasium.
+    - À CHAQUE entrée : le joueur perd 2 steps (si possible).
+    - Salle fatigante (on fait du sport -> on se fatigue).
+    - Portes : 4 directions (UP / DOWN / LEFT / RIGHT).
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Gymnasium",
+            couleur="red",
+            portes={
+                Dir.DOWN:  Door(0),
+                Dir.LEFT:  Door(0),
+                Dir.RIGHT: Door(0),
+            },
+            image=os.path.join(ASSETS_RED, "Gymnasium_Icon.png"),
+            cout_gemmes=0,   # tu peux mettre 1 si tu veux la rendre plus chère
+            rarity=1,        # fréquence moyenne
+        )
+        self.draftable = True
+        self.fixed_doors = True
+
+    def on_enter(self, joueur, manoir) -> None:
+        """À chaque entrée : perdre 2 steps (sans aller en dessous de 0)."""
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        cur = getattr(inv, "steps", 0)
+        perte = min(2, cur)      # on ne peut pas perdre plus que ce qu'on a
+        inv.steps = cur - perte
+
+        if perte > 0:
+            print(f"Gymnasium : -{perte} steps (séance de sport)")

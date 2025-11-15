@@ -1,11 +1,12 @@
 # classes/rooms/tirage.py
 import random
 from .rooms.purple_rooms import Bedroom
-from .rooms.red_rooms import Chapel ,WeightRoom   # adapte le nom si ton fichier s'appelle autrement
+from .rooms.red_rooms import Chapel ,WeightRoom,Gymnasium
 from .rooms.blue_rooms import Garage, Vault  
 from .rooms.base import Door  # et Dir si besoin ailleurs
 from .rooms.green_rooms import Veranda, Terrace
 from .rooms.orange_rooms import Hallway, Foyer,WestWingHall,Passageway
+from .rooms.yellow_rooms import Locksmith, Kitchen
 
 def is_border(i: int, j: int, lignes: int, colonnes: int) -> bool:
     """Retourne True si (i, j) est sur la bordure de la grille."""
@@ -30,6 +31,9 @@ FACTORIES = [
     lambda: Foyer(),
     lambda: WestWingHall(),
     lambda: Passageway(),
+    lambda: Gymnasium(),
+    lambda: Locksmith(),
+    lambda: Kitchen(),
 ]
 
 
