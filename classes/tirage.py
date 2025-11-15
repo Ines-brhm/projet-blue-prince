@@ -79,7 +79,7 @@ def _sample_level(progress: float) -> int:
     0 = début de journée (portes ouvertes), 1 = vers le haut (portes dures).
     """
     # barème simple (ajuste si tu veux)
-    if progress <= 0.15:
+    if progress <= 0.25:
         p0, p1, p2 = 1.00, 0.00, 0.00       # tout ouvert
     elif progress <= 0.50:
         p0, p1, p2 = 0.60, 0.40, 0.00       # un peu de lvl1

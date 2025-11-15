@@ -309,7 +309,6 @@ class Manoir:
 
 
                 # Place la room ; on ne touche pas aux autres directions/levels
-                self.grille[i][j] = room
                 return True
 
             # orientation pas bonne -> on tourne la salle de 90°

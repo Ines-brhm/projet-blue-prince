@@ -6,6 +6,7 @@ from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall
 from .tirage import attend_choix_joueur
 from .end_game import etat_fin_partie
+from .depense import payer_room_si_possible
 PANNEAU_LARGEUR = 500
 
 def main():
@@ -56,16 +57,20 @@ def main():
                         choix = draft_choices[draft_selected]
                         
                         
+                        
                         if manoir.place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None)):
-                            manoir.grille[i][j] = choix
+                            payee=payer_room_si_possible(choix, inv,manoir)
+                            print(payee)
+                            if payee:
+                                manoir.grille[i][j] = choix
                             
                             # effet d'entrée
-                            if hasattr(choix, "on_enter"):
-                                choix.on_enter(joueur, manoir)
-                            # sortir du mode draft
-                            mode_draft = False
-                            draft_choices = []
-                            draft_selected = 0
+                                if hasattr(choix, "on_enter"):
+                                    choix.on_enter(joueur, manoir)
+                                # sortir du mode draft
+                                mode_draft = False
+                                draft_choices = []
+                                draft_selected = 0
                         else :
                             # RE-TIRAGE 
                             draft_choices = attend_choix_joueur(manoir, joueur) or []
