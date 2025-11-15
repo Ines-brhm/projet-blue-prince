@@ -53,21 +53,23 @@ def main():
                     elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         i, j = joueur.i, joueur.j
                         choix = draft_choices[draft_selected]
-
-                        # poser la room (en respectant orientation si tu as la méthode)
-                        if hasattr(manoir, "place_room_oriented"):
-                            manoir.place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None))
-                        else:
+                        
+                        
+                        if manoir.place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None)):
                             manoir.grille[i][j] = choix
+                            
+                            # effet d'entrée
+                            if hasattr(choix, "on_enter"):
+                                choix.on_enter(joueur, manoir)
+                            # sortir du mode draft
+                            mode_draft = False
+                            draft_choices = []
+                            draft_selected = 0
+                        else :
+                            # RE-TIRAGE 
+                            draft_choices = attend_choix_joueur(manoir, joueur) or []
+                            draft_selected = 0
 
-                        # effet d'entrée
-                        if hasattr(choix, "on_enter"):
-                            choix.on_enter(joueur, manoir)
-
-                        # sortir du mode draft
-                        mode_draft = False
-                        draft_choices = []
-                        draft_selected = 0
 
                     # TOUTES les autres touches sont ignorées en mode draft
                     continue

@@ -22,6 +22,7 @@ def piocher_roomss(k: int = 3, i: int = None):
     rooms = [f() for f in random.sample(FACTORIES, k)]
 
     rooms = [randomize_doors_progress(r, i) for r in rooms]
+    print("j'ai tiree des chambre",rooms[0].nom,rooms[1].nom,rooms[2].nom)
     return rooms
 
 def attend_choix_joueur(manoir, joueur):
