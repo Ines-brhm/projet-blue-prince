@@ -22,19 +22,15 @@ class Bedroom(BaseSalle):
             rarity=0,
         )
         self.draftable = True
-        self._loot_chance = 0.30  # ~30% d’avoir un objet
+        self._loot_chance = 1 # ~30% d’avoir un objet
 
         # table de loot simple, inspirée de ta description
         self._drops = [
-            "apple",             # Apple
+            #"apple",             # Apple
             "die",               # 1 Die
             "key",               # 1x Key
             "gem",               # 1 Gem
             "gold3",             # 3 Gold
-            "car_keys",          # Car Keys
-            "coin_purse",        # Coin Purse
-            "locked_trunk",      # Locked Trunk
-            "sleeping_mask",     # Sleeping Mask
         ]
 
     def on_enter(self, joueur, manoir) -> None:
@@ -50,15 +46,19 @@ class Bedroom(BaseSalle):
             drop = random.choice(self._drops)
             if drop == "die":
                 inv.dice = getattr(inv, "dice", 0) + 1
-                print("🎲 Bedroom: +1 Die")
+                manoir.show_message("🎲 Bedroom: +1 Dice",1.0)
+                
             elif drop == "key":
                 inv.keys = getattr(inv, "keys", 0) + 1
+                manoir.show_message( "🗝️ Bedroom: +1 Key",1.0)
                 print("🗝️ Bedroom: +1 Key")
             elif drop == "gem":
-                inv.gems = getattr(inv, "gems", 0) + 1
+                inv.gems = getattr(inv,"gems", 0) + 1
+                manoir.show_message("💎 Bedroom: +1 Gem",1.0)
                 print("💎 Bedroom: +1 Gem")
             elif drop == "gold3":
-                inv.gold = getattr(inv, "gold", 0) + 3
+                inv.gold = getattr(inv,"gold", 0) + 3
+                manoir.show_message("🪙 Bedroom: +3 Gold",1.0)
                 print("🪙 Bedroom: +3 Gold")
             else:
                 # objets “lore” → on les range côté joueur (liste simple)
