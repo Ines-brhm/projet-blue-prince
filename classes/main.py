@@ -5,7 +5,7 @@ from .joueur import Joueur
 from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall
 from .tirage import attend_choix_joueur
-
+from .end_game import etat_fin_partie
 PANNEAU_LARGEUR = 500
 
 def main():
@@ -78,6 +78,7 @@ def main():
                 # -------- Mode normal : déplacements (ZQSD + flèches si tu veux) --------
                 if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT):
                     moved = joueur.deplacer_key(manoir, event.key)
+                    etat_fin_partie(manoir, joueur, inv,fen)
                     if moved:
                         # Si la case est vide : proposer 3 rooms
                         choix = attend_choix_joueur(manoir, joueur)
