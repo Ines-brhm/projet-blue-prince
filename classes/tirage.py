@@ -5,7 +5,7 @@ from .rooms.red_rooms import Chapel ,WeightRoom   # adapte le nom si ton fichier
 from .rooms.blue_rooms import Garage, Vault  
 from .rooms.base import Door  # et Dir si besoin ailleurs
 from .rooms.green_rooms import Veranda, Terrace
-from .rooms.orange_rooms import Hallway
+from .rooms.orange_rooms import Hallway, Foyer,WestWingHall,Passageway
 
 def is_border(i: int, j: int, lignes: int, colonnes: int) -> bool:
     """Retourne True si (i, j) est sur la bordure de la grille."""
@@ -27,6 +27,9 @@ FACTORIES = [
     lambda: Veranda(),
     lambda: Terrace(),
     lambda: Hallway(),
+    lambda: Foyer(),
+    lambda: WestWingHall(),
+    lambda: Passageway(),
 ]
 
 

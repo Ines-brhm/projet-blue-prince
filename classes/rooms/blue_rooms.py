@@ -81,7 +81,14 @@ class Garage(BaseSalle):
             if not getattr(inv,"shovel",0):
                 inv.shovel = getattr(inv, "shovel", 0) + 1
                 print(" Garage: found Shovel")
-class Vault(BaseSalle):
+class Vault(BaseSalle): 
+    """
+    Blue Room — Vault.
+    - 1 seule porte (cul-de-sac).
+    - Contient 40 gold.
+    - Première entrée : +40 gold.
+    - Aucun effet après la récupération du trésor.
+    """
     def __init__(self):
         super().__init__(
             nom="Vault",
