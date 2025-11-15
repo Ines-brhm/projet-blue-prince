@@ -41,14 +41,48 @@ class Veranda(BaseSalle):
 
         if r < 0.5:
             inv.gems += 1
-            print("💎 Veranda : +1 gemme")
         elif r < 0.8:
             inv.gold += 10
-            print("🪙 Veranda : +10 gold")
         else:
             if getattr(inv, "shovel", 0) == 0:
                 inv.shovel = 1
-                print("🛠️ Veranda : +1 shovel")
             else:
                 inv.gold += 5
-                print("🪙 Veranda : +5 gold")
+
+
+    
+
+
+class Terrace(BaseSalle):
+    """
+    Green Room — Terrace.
+    - 1 porte .
+    - Coût : 0 gemme.
+    - Rareté : 1.
+    - Room de bordure uniquement.
+    - Effet : active un flag qui rend les green rooms gratuites.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Terrace",
+            couleur="green",
+            portes={ 
+                Dir.DOWN: Door(0),    # 1 seule porte en bas
+            },
+            image=os.path.join(ASSETS_GREEN, "Terrace_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+        self.draftable = True
+        self.border_only = True
+        self._activated = False   # effet à usage unique
+
+    def on_enter(self, joueur, manoir):
+        """Effet : green rooms deviennent gratuites."""
+        if self._activated:
+            return
+
+        setattr(manoir, "green_rooms_free", True)
+        self._activated = True
+        print("Terrace : les Green Rooms ne coûtent plus de gemmes à drafter !")
+
