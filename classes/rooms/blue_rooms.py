@@ -80,4 +80,27 @@ class Garage(BaseSalle):
         if random.random() < self._loot_chance:
             if not getattr(inv,"shovel",0):
                 inv.shovel = getattr(inv, "shovel", 0) + 1
-                print("🛠️ Garage: found Shovel")
+                print(" Garage: found Shovel")
+class Vault(BaseSalle):
+    def __init__(self):
+        super().__init__(
+            nom="Vault",
+            couleur="blue",
+            portes={Dir.DOWN: Door(0)},
+            image=os.path.join(ASSETS_BLUE, "Vault_Icon.png"),
+            cout_gemmes=3,
+            rarity=3,
+        )
+        self.draftable   = True
+        self._gold_taken = False
+        self.gold_amount = 40
+
+    def on_enter(self, joueur, manoir) -> None:
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        if not self._gold_taken:
+            inv.gold = getattr(inv, "gold", 0) + self.gold_amount
+            self._gold_taken = True
+            print(f"Vault: +{self.gold_amount} gold")
