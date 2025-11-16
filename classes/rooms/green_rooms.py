@@ -114,7 +114,7 @@ class Cloister(BaseSalle):
             rarity=3,
         )
         self.draftable = True
-        self.border_only = False     # Cloister peut être n'importe où
+        self.border_only = True
         self._reward_done = False    # pour que l'effet ne se fasse qu'une fois
 
     def on_enter(self, joueur, manoir) -> None:
@@ -165,6 +165,7 @@ class Courtyard(BaseSalle):
             rarity=1,      # standard
         )
         self.draftable    = True
+        self.border_only  = True
         self._loot_chance = 0.75   # 75% de chance de loot
 
     def on_enter(self, joueur, manoir) -> None:
@@ -215,6 +216,7 @@ class Patio(BaseSalle):
             rarity=2,
         )
         self.draftable  = True
+        self.border_only = True
         self._activated = False   # effet une seule fois
 
     def on_enter(self, joueur, manoir) -> None:

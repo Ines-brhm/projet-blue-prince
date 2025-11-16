@@ -46,20 +46,20 @@ class Bedroom(BaseSalle):
             drop = random.choice(self._drops)
             if drop == "die":
                 inv.dice = getattr(inv, "dice", 0) + 1
-                manoir.show_message("🎲 Bedroom: +1 Dice",1.0)
+                manoir.show_message(" Bedroom: +1 Dice",1.0)
                 
             elif drop == "key":
                 inv.keys = getattr(inv, "keys", 0) + 1
-                manoir.show_message( "🗝️ Bedroom: +1 Key",1.0)
-                print("🗝️ Bedroom: +1 Key")
+                manoir.show_message( " Bedroom: +1 Key",1.0)
+                print("Bedroom: +1 Key")
             elif drop == "gem":
                 inv.gems = getattr(inv,"gems", 0) + 1
-                manoir.show_message("💎 Bedroom: +1 Gem",1.0)
-                print("💎 Bedroom: +1 Gem")
+                manoir.show_message(" Bedroom: +1 Gem",1.0)
+                print(" Bedroom: +1 Gem")
             elif drop == "gold3":
                 inv.gold = getattr(inv,"gold", 0) + 3
-                manoir.show_message("🪙 Bedroom: +3 Gold",1.0)
-                print("🪙 Bedroom: +3 Gold")
+                manoir.show_message(" Bedroom: +3 Gold",1.0)
+                print(" Bedroom: +3 Gold")
             else:
                 # objets “lore” → on les range côté joueur (liste simple)
                 bag = getattr(joueur, "items", None)
