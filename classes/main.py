@@ -52,6 +52,13 @@ def main():
                         draft_selected = (draft_selected - 1) % len(draft_choices)
                     elif event.key == pygame.K_RIGHT:
                         draft_selected = (draft_selected + 1) % len(draft_choices)
+                    elif event.key == pygame.K_a:  #utilisation du dés
+                        bool_dice_use,dice_rooms=inv.use_dice(manoir,joueur)
+                        if bool_dice_use:
+                            draft_choices=dice_rooms
+                            draft_selected = 0
+                        else : 
+                            manoir.show_message("vous n'avez pas de dés", 1.0) 
                     elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         i, j = joueur.i, joueur.j
                         choix = draft_choices[draft_selected]

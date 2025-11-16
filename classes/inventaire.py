@@ -1,10 +1,11 @@
+from .tirage import attend_choix_joueur
 class Inventaire:
     def __init__(self):
         self.steps = 700
         self.gold = 0
         self.gems = 1
         self.keys = 10
-        self.dice = 0
+        self.dice = 10
         self.shovel=0
         self.lockpicks=1
 
@@ -16,3 +17,10 @@ class Inventaire:
         if self.gems >= n:
             self.gems -= n; return True
         return False
+    def use_dice(self,manoir,joueur) :
+        if self.dice >0:
+            self.dice-=1
+            rooms =attend_choix_joueur(manoir, joueur)
+            return True,rooms
+        return False , []
+        
