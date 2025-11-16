@@ -3,6 +3,7 @@ import pygame
 from .rooms.base import Dir  
 from .rooms.base import Door  
 from.ouverture_porte import demande_ouverture
+import random
 # (tes constantes...)
 
 # Table des vecteurs par direction
@@ -46,6 +47,7 @@ class Manoir:
 
         self.largeur = self.colonnes * self.taille_case
         self.hauteur = self.lignes   * self.taille_case
+        self.joueur = None  
 
         # entrée (bas-centre)
         self.pos_entree = (self.lignes - 1, self.colonnes // 2)
@@ -179,6 +181,58 @@ class Manoir:
             return (False, None, "Hors de la grille.")
         return (True, (ni, nj), "")
     
+
+
+    ############### Actions spéciales avec la pelle ###############
+    
+    def essayer_creuser(self):
+        """Tente de creuser dans la salle actuelle avec une pelle."""
+        i, j = self.joueur.i, self.joueur.j
+        salle = self.grille[i][j]
+        inv = getattr(self.joueur, "inv", None)
+
+        if salle is None or inv is None:
+            return
+
+        # Vérifier que la salle est une Green Room
+        if getattr(salle, "couleur", "") != "green":
+            self.show_message("On ne peut creuser que dans les pièces vertes.", 1.0)
+            return
+
+        # Vérifier que le joueur a une pelle
+        if getattr(inv, "shovel", 0) <= 0:
+            self.show_message("Tu n'as pas de pelle…", 1.0)
+            return
+
+        # Consommer une pelle
+        inv.shovel -= 1
+
+        # Loot aléatoire
+        r = random.random()
+        if r < 0.40:
+            gain = random.randint(3, 8)
+            inv.gold += gain
+            self.show_message(f"Tu déterres {gain} or !", 1.0)
+
+        elif r < 0.70:
+            inv.gems += 1
+            self.show_message("Tu trouves 1 gemme enfouie !", 1.0)
+
+        elif r < 0.85:
+            inv.lockpicks += 1
+            self.show_message("Tu trouves un vieux crochet de serrure (+1 pick).", 1.0)
+
+        else:
+            inv.shovel += 1
+            self.show_message("Incroyable… une autre pelle !", 1.0)
+
+
+
+
+
+
+
+
     def _get_thumb(self, path: str, size: int = CHOIX_TAILLE):
         """Charge une image et la met au format vignette."""
         if not path:

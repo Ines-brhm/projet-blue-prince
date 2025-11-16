@@ -21,6 +21,7 @@ def main():
     manoir = Manoir()
     joueur = Joueur(pos_depart=manoir.pos_entree)
     joueur.inv = inv
+    manoir.joueur = joueur
 
     # Salle de départ posée une fois
     i0, j0 = manoir.pos_entree
@@ -88,9 +89,14 @@ def main():
                     continue
 
                 # -------- Mode normal : déplacements (ZQSD + flèches si tu veux) --------
-                if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT,pygame.K_m):
+                if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT,pygame.K_m,pygame.K_c):
                     if event.key == pygame.K_m:
                         try_open_shop(manoir, joueur, fen, inv)
+
+                    elif event.key == pygame.K_c:
+                        manoir.essayer_creuser()
+                        continue  
+
                     moved = joueur.deplacer_key(manoir, event.key)
                     etat_fin_partie(manoir, joueur, inv,fen)
                     if moved:
