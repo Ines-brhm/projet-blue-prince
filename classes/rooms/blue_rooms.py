@@ -314,3 +314,4 @@ class SpareRoom(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+

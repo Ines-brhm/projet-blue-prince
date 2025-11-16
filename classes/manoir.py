@@ -144,6 +144,7 @@ class Manoir:
                 f"Keys  : {inventaire.keys}",
                 f"Dice  : {inventaire.dice}",
                 f"shovel  : {inventaire.shovel}",
+                f"Detector  : {inventaire.metal_detector}",
             ]
             y = 60
             for li in lignes:
@@ -183,7 +184,7 @@ class Manoir:
     
 
 
-    ############### Actions spéciales avec la pelle ###############
+    ############### creuser avec la pelle ###############
     
     def essayer_creuser(self):
         """Tente de creuser dans la salle actuelle avec une pelle."""
@@ -206,29 +207,35 @@ class Manoir:
 
         # Consommer une pelle
         inv.shovel -= 1
+        p_tresor = 0.30 # 30% de chance de trouver un trésor
+
+        if inv.metal_detector:
+            p_tresor = 1.00  # 70% de cahnce  si détecteur de métaux 
+                # Consommer 1 détecteur
+            inv.metal_detector -= 1
+
 
         # Loot aléatoire
         r = random.random()
-        if r < 0.40:
+        if r > p_tresor:
+            self.show_message("Tu ne trouves rien en creusant.", 1.0)
+            return
+        
+        loot = random.choice(["gold", "gem", "shovel"])
+
+        if loot == "gold":
             gain = random.randint(3, 8)
             inv.gold += gain
-            self.show_message(f"Tu déterres {gain} or !", 1.0)
+            self.show_message(f" Détecteur: +{gain} gold !", 1.5)
 
-        elif r < 0.70:
-            inv.gems += 1
-            self.show_message("Tu trouves 1 gemme enfouie !", 1.0)
+        elif loot == "gem":
+            gain = 1
+            inv.gems += gain
+            self.show_message(f"Détecteur: +{gain} gemme !", 1.5)
 
-        elif r < 0.85:
-            inv.lockpicks += 1
-            self.show_message("Tu trouves un vieux crochet de serrure (+1 pick).", 1.0)
-
-        else:
+        else:  
             inv.shovel += 1
-            self.show_message("Incroyable… une autre pelle !", 1.0)
-
-
-
-
+            self.show_message(" Détecteur: +1 shovel !", 1.5)
 
 
 

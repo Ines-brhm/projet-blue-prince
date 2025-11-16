@@ -225,4 +225,4 @@ class Corridor(BaseSalle):
         )
 
         self.draftable = True
-        self.fixed_doors = True  # 🔒 empêche toute randomisation des verrous
+        self.fixed_doors = True  # empêche toute randomisation des verrous
