@@ -2,7 +2,7 @@
 import random
 from .rooms.purple_rooms import Bedroom,GuestBedroom,Boudoir,MasterBedroom,ServantsQuarters,Nursery
 from .rooms.red_rooms import Chapel ,WeightRoom,Gymnasium,Lavatory
-from .rooms.blue_rooms import Garage, Vault  
+from .rooms.blue_rooms import Garage, Vault,Den,WineCellar,Pantry,TrophyRoom,RumpusRoom,Nook,SpareRoom
 from .rooms.base import Door  # et Dir si besoin ailleurs
 from .rooms.green_rooms import Veranda, Terrace,Cloister,Courtyard,Patio
 from .rooms.orange_rooms import Hallway, Foyer,WestWingHall,Passageway,EastWingHall,Corridor
@@ -45,6 +45,13 @@ FACTORIES = [
     lambda: Courtyard(),
     lambda: Patio(),
     lambda: Lavatory(),
+    lambda: Den(),
+    lambda: WineCellar(),
+    lambda: Pantry(),
+    lambda: TrophyRoom(),
+    lambda: RumpusRoom(),
+    lambda: Nook(),
+    lambda: SpareRoom(),
 ]
 
 
@@ -124,3 +131,7 @@ def randomize_doors_progress(room, i: int):
 
     room.portes = {d: Door(_sample_level(progress)) for d in portes.keys()}
     return room
+
+
+
+

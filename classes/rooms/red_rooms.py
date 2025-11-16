@@ -48,12 +48,12 @@ class Chapel(BaseSalle):
                 # gemmes 1–2
                 gain = random.randint(1, 2)
                 inv.gems = getattr(inv, "gems", 0) + gain
-                print(f"💎 Chapel: +{gain} gem(s)")
+                print(f" Chapel: +{gain} gem(s)")
             else:
                 # or parmi {2..12, 14}
                 gain = random.choice(self._gold_piles)
                 inv.gold = getattr(inv, "gold", 0) + gain
-                print(f"🪙 Chapel: +{gain} or")
+                print(f" Chapel: +{gain} or")
 
 
 class WeightRoom(BaseSalle):
