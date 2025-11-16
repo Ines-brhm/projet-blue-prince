@@ -45,6 +45,11 @@ PRODUCTS = [
 
 # ---------- AFFICHAGE (overlay bloquant) ----------
 def _draw_shop_overlay(fenetre, products, selected_idx, gold):
+    """
+    Affiche l’interface du magasin sous forme d’overlay bloquant.
+    Dessine un panneau centré listant les objets disponibles, 
+    surligne l’élément sélectionné et montre le montant d'or du joueur.
+    """
     w, h = fenetre.get_size()
     voile = pygame.Surface((w, h), pygame.SRCALPHA)
     voile.fill((0, 0, 0, 180))
