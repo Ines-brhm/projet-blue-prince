@@ -69,3 +69,167 @@ class Bedroom(BaseSalle):
                 bag.append(drop)
                 # log léger pour debug
                 print(f"🛏️ Bedroom: found {drop.replace('_',' ')}")
+
+
+class GuestBedroom(BaseSalle):
+    """
+    Purple Room — Guest Bedroom.
+    - Dead end (1 porte DOWN)
+    - Effet : +10 steps à chaque entrée
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Guest Bedroom",
+            couleur="purple",
+            portes={
+                Dir.DOWN: Door(0),    # cul-de-sac
+            },
+            image=os.path.join(ASSETS_PURPLE, "Guest_Bedroom_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+
+        self.draftable = True
+
+    def on_enter(self, joueur, manoir):
+        """+10 steps à chaque entrée."""
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        inv.steps += 10
+        print("Guest Bedroom : +10 steps")
+
+
+class Boudoir(BaseSalle):
+    """
+    Purple Room — Boudoir.
+    - Dead end (1 porte DOWN)
+    - Aucun effet particulier.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Boudoir",
+            couleur="purple",
+            portes={
+                Dir.DOWN: Door(0),
+                Dir.LEFT: Door(0)  
+            },
+            image=os.path.join(ASSETS_PURPLE, "Boudoir_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+        self.draftable = True
+
+class MasterBedroom(BaseSalle):
+    """
+    Purple Room — Master Bedroom
+    Effet : +1 step pour CHAQUE salle déjà placée dans le manoir.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Master Bedroom",
+            couleur="purple",
+            portes={Dir.DOWN: Door(0)},   
+            image=os.path.join(ASSETS_PURPLE, "Master_Bedroom_Icon.png"),
+            cout_gemmes=0,
+            rarity=0,
+        )
+        self.draftable = True
+
+    def on_enter(self, joueur, manoir) -> None:
+        """
+        Effet : +1 step pour chaque salle déjà posée dans le manoir.
+        """
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+        # compter les salles déjà placées
+        nb = 0
+        for ligne in manoir.grille:
+            for salle in ligne:
+                if salle is not None:
+                    nb += 1
+        # ajouter les steps
+        inv.steps = getattr(inv, "steps", 0) + nb
+
+
+
+class ServantsQuarters(BaseSalle):
+    """
+    Purple Room — Servant's Quarters
+    Effet : +1 key pour CHAQUE chambre de type Bedroom déjà dans le manoir.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Servant's Quarters",
+            couleur="purple",
+            portes={Dir.DOWN: Door(0)},   # une seule porte en bas
+            image=os.path.join(ASSETS_PURPLE, "Servants_Quarters_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+        self.draftable = True
+
+    def on_enter(self, joueur, manoir) -> None:
+        """+1 key pour chaque Bedroom déjà posée dans le manoir."""
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        # Noms des chambres "Bedroom"
+        bedroom_names = {
+            "Bedroom",
+            "Guest Bedroom",
+            "Boudoir",
+            "Master Bedroom",
+            "Servant's Quarters",
+        }
+
+        nb_bedrooms = 0
+        for ligne in manoir.grille:
+            for salle in ligne:
+                if salle is not None and getattr(salle, "nom", "") in bedroom_names:
+                    nb_bedrooms += 1
+
+        if nb_bedrooms > 0:
+            inv.keys = getattr(inv, "keys", 0) + nb_bedrooms
+            print(f" Servant's Quarters : +{nb_bedrooms} keys (pour {nb_bedrooms} Bedrooms)")
+        else:
+            print(" Servant's Quarters : aucune Bedroom dans le manoir pour l’instant.")
+
+class Nursery(BaseSalle):
+    """
+    Purple Room — Nursery.
+    Effet : Quand vous DRAFTEZ une chambre de type Bedroom, gagnez +5 steps.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Nursery",
+            couleur="purple",
+            portes={Dir.DOWN: Door(0)},
+            image=os.path.join(ASSETS_PURPLE, "Nursery_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+        self.draftable = True
+
+    #  quand une autre salle est draftée
+    def on_draft_other_room(self, joueur, room_draftee, manoir):
+        """
+        Appelé lorsqu'une AUTRE salle a été posée sur le manoir.
+        Si cette salle est un Bedroom => +5 steps au joueur.
+        """
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        if getattr(room_draftee, "nom", "") in {
+            "Bedroom",
+            "Guest Bedroom",
+            "Boudoir",
+            "Master Bedroom",
+            "Servant's Quarters",
+        }:
+            inv.steps = getattr(inv, "steps", 0) + 5
+            print("Nursery : +5 steps (nouvelle Bedroom posée !)")

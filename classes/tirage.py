@@ -1,11 +1,11 @@
 # classes/rooms/tirage.py
 import random
-from .rooms.purple_rooms import Bedroom
-from .rooms.red_rooms import Chapel ,WeightRoom,Gymnasium
+from .rooms.purple_rooms import Bedroom,GuestBedroom,Boudoir,MasterBedroom,ServantsQuarters,Nursery
+from .rooms.red_rooms import Chapel ,WeightRoom,Gymnasium,Lavatory
 from .rooms.blue_rooms import Garage, Vault  
 from .rooms.base import Door  # et Dir si besoin ailleurs
-from .rooms.green_rooms import Veranda, Terrace
-from .rooms.orange_rooms import Hallway, Foyer,WestWingHall,Passageway
+from .rooms.green_rooms import Veranda, Terrace,Cloister,Courtyard,Patio
+from .rooms.orange_rooms import Hallway, Foyer,WestWingHall,Passageway,EastWingHall,Corridor
 from .rooms.yellow_rooms import Locksmith, Kitchen
 
 def is_border(i: int, j: int, lignes: int, colonnes: int) -> bool:
@@ -34,6 +34,17 @@ FACTORIES = [
     lambda: Gymnasium(),
     lambda: Locksmith(),
     lambda: Kitchen(),
+    lambda: EastWingHall(),
+    lambda: Corridor(),
+    lambda: GuestBedroom(),
+    lambda: Boudoir(),
+    lambda: MasterBedroom(),
+    lambda: ServantsQuarters(),
+    lambda: Nursery(),
+    lambda: Cloister(),
+    lambda: Courtyard(),
+    lambda: Patio(),
+    lambda: Lavatory(),
 ]
 
 

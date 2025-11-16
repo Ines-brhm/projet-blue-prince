@@ -181,4 +181,48 @@ class Passageway(BaseSalle):
         print("➡ Passageway : +1 step (couloir rapide)")
            
 
+
+class EastWingHall(BaseSalle):
+    """
+    Orange Room — East Wing Hall.
+    - 3 portes : LEFT / RIGHT / DOWN.
+    - Pas d'effet spécial, simple couloir.
+    """
+    def __init__(self):
+        super().__init__(
+            nom="East Wing Hall",
+            couleur="orange",
+            portes={
+                Dir.LEFT:  Door(0),
+                Dir.RIGHT: Door(0),
+                Dir.DOWN:  Door(0),
+            },
+            image=os.path.join(ASSETS_ORANGE, "East_Wing_Hall_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+        self.draftable = True  # elle peut apparaître dans le tirage
+
     
+class Corridor(BaseSalle):
+    """
+    Orange Room — Corridor.
+    - 2 portes verticales (UP, DOWN)
+    - Toujours déverrouillé (Door level = 0)
+    - Pas d'effet spécial
+    """
+    def __init__(self):
+        super().__init__(
+            nom="Corridor",
+            couleur="orange",
+            portes={
+                Dir.UP:   Door(0),
+                Dir.DOWN: Door(0),
+            },
+            image=os.path.join(ASSETS_ORANGE, "Corridor_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,
+        )
+
+        self.draftable = True
+        self.fixed_doors = True  # 🔒 empêche toute randomisation des verrous

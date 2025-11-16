@@ -124,3 +124,53 @@ class Gymnasium(BaseSalle):
 
         if perte > 0:
             print(f"Gymnasium : -{perte} steps (séance de sport)")
+
+
+# classes/rooms/red_rooms.py
+from .base import BaseSalle, Dir, Door
+import os
+import random
+
+ASSETS_RED = os.path.join("classes", "rooms", "assets", "red")
+
+# ... Chapel, WeightRoom, Gymnasium, etc. ...
+
+
+class Lavatory(BaseSalle):
+    """
+    Red Room — Lavatory.
+    - 1 porte (DOWN).
+    - À chaque entrée : tu perds 2 steps.
+    - Petite chance de trouver une clé oubliée.
+    """
+
+    def __init__(self):
+        super().__init__(
+            nom="Lavatory",
+            couleur="red",
+            portes={
+                Dir.DOWN: Door(0),
+            },
+            image=os.path.join(ASSETS_RED, "Lavatory_Icon.png"),
+            cout_gemmes=0,
+            rarity=1,   # standard
+        )
+        self.draftable = True
+        self._key_chance = 0.30   # 30% de chance de trouver une clé
+
+    def on_enter(self, joueur, manoir) -> None:
+        inv = getattr(joueur, "inv", None)
+        if inv is None:
+            return
+
+        # malus principal : -2 steps si possible
+        cur = getattr(inv, "steps", 0)
+        if cur > 0:
+            perte = min(2, cur)
+            inv.steps = cur - perte
+            print(f" Lavatory : tu perds {perte} steps.")
+
+        # petite chance de trouver une clé
+        if random.random() < self._key_chance:
+            inv.keys = getattr(inv, "keys", 0) + 1
+            print("Lavatory : tu trouves une clé oubliée.")
