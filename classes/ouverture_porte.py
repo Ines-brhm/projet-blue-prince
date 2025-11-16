@@ -68,7 +68,8 @@ def demande_ouverture(fenetre, inv, level: int) -> bool:
                 if level == 1:
                     if event.key == pygame.K_e:
                         # crocheter
-                        if lockpicks > 0:
+                        lockpick_open,data=inv.use_item("lockpick", manoir=None, joueur=None)
+                        if lockpick_open :
                             return True
                         else:
                             _draw_overlay(fenetre, lines + ["", "❌ Pas de pick disponible"])

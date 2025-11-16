@@ -54,7 +54,7 @@ def main():
                     elif event.key == pygame.K_RIGHT:
                         draft_selected = (draft_selected + 1) % len(draft_choices)
                     elif event.key == pygame.K_a:  #utilisation du dés
-                        bool_dice_use,dice_rooms=inv.use_dice(manoir,joueur)
+                        bool_dice_use,dice_rooms=inv.use_item("dice", manoir, joueur)
                         if bool_dice_use:
                             draft_choices=dice_rooms
                             draft_selected = 0
@@ -94,7 +94,8 @@ def main():
                         try_open_shop(manoir, joueur, fen, inv)
 
                     elif event.key == pygame.K_c:
-                        manoir.essayer_creuser()
+                        #manoir.essayer_creuser()
+                        inv.use_item("shovel", manoir, joueur)
                         continue  
 
                     moved = joueur.deplacer_key(manoir, event.key)

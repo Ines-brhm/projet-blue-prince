@@ -186,9 +186,10 @@ class Manoir:
 
 
     ############### creuser avec la pelle ###############
-    
+    """    
     def essayer_creuser(self):
-        """Tente de creuser dans la salle actuelle avec une pelle."""
+        Tente de creuser dans la salle actuelle avec une pelle.
+    
         i, j = self.joueur.i, self.joueur.j
         salle = self.grille[i][j]
         inv = getattr(self.joueur, "inv", None)
@@ -238,7 +239,7 @@ class Manoir:
             inv.shovel += 1
             self.show_message(" Détecteur: +1 shovel !", 1.5)
 
-
+            """
 
 
     def _get_thumb(self, path: str, size: int = CHOIX_TAILLE):
