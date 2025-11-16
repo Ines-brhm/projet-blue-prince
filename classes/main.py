@@ -4,7 +4,7 @@ from .manoir import Manoir
 from .joueur import Joueur
 from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall
-from .tirage import attend_choix_joueur
+from .tirage import attend_choix_joueur,place_room_oriented
 from .end_game import etat_fin_partie
 from .depense import payer_room_si_possible , try_open_shop
 PANNEAU_LARGEUR = 500
@@ -66,7 +66,7 @@ def main():
                         
                         
                         
-                        if manoir.place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None)):
+                        if place_room_oriented(choix, i, j, getattr(joueur, "last_dir", None),manoir):
                             payee=payer_room_si_possible(choix, inv,manoir)
                             print(payee)
                             if payee:

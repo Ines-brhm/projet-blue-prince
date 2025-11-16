@@ -1,5 +1,7 @@
-# classes/rooms/tirage.py
+# classes/tirage.py
 import random
+from .rooms.base import Dir  
+
 from .rooms.purple_rooms import Bedroom,GuestBedroom,Boudoir,MasterBedroom,ServantsQuarters,Nursery
 from .rooms.red_rooms import Chapel ,WeightRoom,Gymnasium,Lavatory
 from .rooms.blue_rooms import Garage, Vault,Den,WineCellar,Pantry,TrophyRoom,RumpusRoom,Nook,SpareRoom
@@ -149,5 +151,67 @@ def randomize_doors_progress(room, i: int):
     return room
 
 
+# --- helpers directions (simples, locaux à tirage) ---
+def _opp(d):
+    return {Dir.UP:Dir.DOWN, Dir.DOWN:Dir.UP, Dir.LEFT:Dir.RIGHT, Dir.RIGHT:Dir.LEFT}[d]
+
+def _rot90_dir(d):
+    return {Dir.UP:Dir.RIGHT, Dir.RIGHT:Dir.DOWN, Dir.DOWN:Dir.LEFT, Dir.LEFT:Dir.UP}[d]
+
+def _door_would_exit(i, j, d,manoir) -> bool:
+    return ((i == 0 and d == Dir.UP) or
+            (i == manoir.lignes-1 and d == Dir.DOWN) or
+            (j == 0 and d == Dir.LEFT) or
+            (j == manoir.colonnes-1 and d == Dir.RIGHT))
+
+# 1) Tourner la salle de 90° horaire
+def rotate_room_once(room) -> None:
+    new_portes = {}
+    for d, door in room.portes.items():
+        nd =_rot90_dir(d)
+        new_portes[nd] = Door(door.level)
+    room.portes = new_portes
+    room.rot = (room.rot + 1) % 4 
 
 
+# 2) Tester l’orientation (True/False)
+def is_room_orientation_ok(room, i:int, j:int, came_from_dir,manoir) -> bool:
+    # a) pas de porte qui sort
+    need= None
+    for d in room.portes.keys():
+        if _door_would_exit(i, j, d, manoir):
+            return False, need
+    # b) porte retour requise si on connaît la direction d’arrivée
+    if came_from_dir is not None:
+        need =_opp(came_from_dir)  # ex: si on est venu par RIGHT, il faut LEFT
+        if need not in room.portes:
+            return False, need
+    return True,need
+
+
+# 3) Essayer jusqu’à 4 rotations puis placer
+def place_room_oriented(room, i: int, j: int, came_from_dir,manoir) -> bool:
+    """
+    Tente de placer `room` à (i,j). On accepte si l'orientation est OK.
+    Si OK, on met le niveau de la porte **de la nouvelle room** dans la direction `need` à 0
+    (sans toucher aux autres portes de cette room).
+    """
+    for _ in range(4):
+        ok, need = is_room_orientation_ok(room, i, j, came_from_dir,manoir)
+        if ok:
+            # -- Déverrouille uniquement la porte de la nouvelle salle côté `need`
+            if need is not None:
+                current = room.portes.get(need)
+                # Si la room a déjà une porte côté `need`, remplace par Door(0) ;
+                if isinstance(current, Door):
+                    if current.level != 0:
+                        room.portes[need] = Door(0)
+
+
+            # Place la room ; on ne touche pas aux autres directions/levels
+            return True
+
+        # orientation pas bonne -> on tourne la salle de 90°
+        rotate_room_once(room)
+
+    return False

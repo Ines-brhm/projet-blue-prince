@@ -313,7 +313,7 @@ class Manoir:
 
         return card_rects
 
-
+    """
     # --- helpers directions (simples, locaux à Manoir) ---
     def _opp(self, d):
         return {Dir.UP:Dir.DOWN, Dir.DOWN:Dir.UP, Dir.LEFT:Dir.RIGHT, Dir.RIGHT:Dir.LEFT}[d]
@@ -354,10 +354,12 @@ class Manoir:
     # 3) Essayer jusqu’à 4 rotations puis placer
     def place_room_oriented(self, room, i: int, j: int, came_from_dir) -> bool:
         """
+    """
         Tente de placer `room` à (i,j). On accepte si l'orientation est OK.
         Si OK, on met le niveau de la porte **de la nouvelle room** dans la direction `need` à 0
         (sans toucher aux autres portes de cette room).
         """
+    """
         for _ in range(4):
             ok, need = self.is_room_orientation_ok(room, i, j, came_from_dir)
             if ok:
@@ -377,7 +379,7 @@ class Manoir:
             self.rotate_room_once(room)
 
         return False
-
+    """
 
     def show_message(self, text: str, seconds: float = 3.0) -> None:
         """Active un message non-bloquant pendant `seconds`."""
