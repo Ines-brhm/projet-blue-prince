@@ -2,8 +2,8 @@ from .tirage import attend_choix_joueur
 class Inventaire:
     def __init__(self):
         self.steps = 700
-        self.gold = 0
-        self.gems = 1
+        self.gold = 10
+        self.gems = 100
         self.keys = 10
         self.dice = 10
         self.shovel=0

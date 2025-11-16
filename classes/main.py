@@ -6,7 +6,7 @@ from .inventaire import Inventaire
 from .rooms.blue_rooms import EntranceHall
 from .tirage import attend_choix_joueur
 from .end_game import etat_fin_partie
-from .depense import payer_room_si_possible
+from .depense import payer_room_si_possible , try_open_shop
 PANNEAU_LARGEUR = 500
 
 def main():
@@ -88,7 +88,9 @@ def main():
                     continue
 
                 # -------- Mode normal : déplacements (ZQSD + flèches si tu veux) --------
-                if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT):
+                if event.key in (pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d,pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT,pygame.K_m):
+                    if event.key == pygame.K_m:
+                        try_open_shop(manoir, joueur, fen, inv)
                     moved = joueur.deplacer_key(manoir, event.key)
                     etat_fin_partie(manoir, joueur, inv,fen)
                     if moved:

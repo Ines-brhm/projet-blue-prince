@@ -22,7 +22,7 @@ class Bedroom(BaseSalle):
             rarity=0,
         )
         self.draftable = True
-        self._loot_chance = 1 # ~30% d’avoir un objet
+        self._loot_chance = 0.3 # ~30% d’avoir un objet
 
         # table de loot simple, inspirée de ta description
         self._drops = [
