@@ -9,6 +9,7 @@ class Inventaire:
         self.shovel=0
         self.lockpicks=1
         self.metal_detector=0
+        self.rabbit_foot=0
 
     def depenser_step(self) -> bool:
         if self.steps <= 0: return False

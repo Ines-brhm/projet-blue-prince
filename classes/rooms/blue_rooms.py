@@ -101,6 +101,7 @@ class Vault(BaseSalle):
         self.draftable   = True
         self._gold_taken = False
         self.gold_amount = 40
+        self.rare = True
 
     def on_enter(self, joueur, manoir) -> None:
         inv = getattr(joueur, "inv", None)
@@ -135,6 +136,7 @@ class Den(BaseSalle):
             rarity=0,          # commune
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir) -> None:
         """À chaque entrée : +1 gemme."""
@@ -173,6 +175,7 @@ class WineCellar(BaseSalle):
         )
         self.draftable = True
         self._gems_given = False
+        self.rare = True
 
     def on_enter(self, joueur, manoir) -> None:
         """Donne 3 gemmes à la première entrée uniquement."""
@@ -205,6 +208,7 @@ class Pantry(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir):
         inv = getattr(joueur, "inv", None)
@@ -233,6 +237,7 @@ class TrophyRoom(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir):
         inv = getattr(joueur, "inv", None)
@@ -261,6 +266,7 @@ class RumpusRoom(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir):
         inv = getattr(joueur, "inv", None)
@@ -288,6 +294,7 @@ class Nook(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir):
         inv = getattr(joueur, "inv", None)
@@ -314,4 +321,5 @@ class SpareRoom(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 

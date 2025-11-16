@@ -145,6 +145,7 @@ class Manoir:
                 f"Dice  : {inventaire.dice}",
                 f"shovel  : {inventaire.shovel}",
                 f"Detector  : {inventaire.metal_detector}",
+                f"Rabbit Foot  : {inventaire.rabbit_foot}",
             ]
             y = 60
             for li in lignes:

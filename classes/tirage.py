@@ -54,13 +54,11 @@ FACTORIES = [
     lambda: SpareRoom(),
 ]
 
-
 all_rooms = [f() for f in FACTORIES]
 
-def piocher_roomss(k: int = 3, i: int = None, j: int = None, manoir=None):
+def piocher_roomss(k: int = 3, i: int = None, j: int = None, manoir=None,inv=None):
     rooms_possible = [f() for f in FACTORIES]
 
-    
 
     if i is not None and j is not None and manoir is not None \
    and not is_border(i, j, manoir.lignes, manoir.colonnes):
@@ -70,8 +68,26 @@ def piocher_roomss(k: int = 3, i: int = None, j: int = None, manoir=None):
         if not getattr(r, "border_only", False)
 ]
 
+     
+    bonus_rare = 0.0  # pas du lapin
+    if inv is not None and inv.rabbit_foot > 0:
+        bonus_rare = 0.10 * inv.rabbit_foot   # +10% par lapin
+        inv.rabbit_foot = 0                   # on consomme tous les pas de lapin
 
-    rooms = random.sample(rooms_possible, k)
+    # Détection des rooms rares
+    rare_rooms = [r for r in rooms_possible if getattr(r, "rare", False)]
+
+    weighted_list = []
+    for r in rooms_possible:
+        if getattr(r, "rare", False):
+            weighted_list.append(r)
+            if random.random() < bonus_rare:
+                weighted_list.append(r)     # double apparition = plus de chances
+        else:
+            weighted_list.append(r)
+
+    # Tirage final
+    rooms = random.sample(weighted_list, k)
     rooms = [randomize_doors_progress(r, i) for r in rooms]
     print("j'ai tiré des chambres :", ", ".join(r.nom for r in rooms))
     return rooms
@@ -82,7 +98,7 @@ def attend_choix_joueur(manoir, joueur):
     i, j = joueur.i, joueur.j
     if manoir.grille[i][j] is None:
         # 3 rooms tirées pour un draft
-        return piocher_roomss(3,i,j,manoir) #on ajoute j et manoir pour les bordures 
+        return piocher_roomss(3,i,j,manoir,joueur.inv) #on ajoute j et manoir pour les bordures 
     return []
 
 

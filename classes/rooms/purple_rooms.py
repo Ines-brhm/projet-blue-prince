@@ -120,6 +120,7 @@ class Boudoir(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
 class MasterBedroom(BaseSalle):
     """
@@ -136,6 +137,7 @@ class MasterBedroom(BaseSalle):
             rarity=0,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir) -> None:
         """
@@ -170,6 +172,7 @@ class ServantsQuarters(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     def on_enter(self, joueur, manoir) -> None:
         """+1 key pour chaque Bedroom déjà posée dans le manoir."""
@@ -213,6 +216,7 @@ class Nursery(BaseSalle):
             rarity=1,
         )
         self.draftable = True
+        self.rare = True
 
     #  quand une autre salle est draftée
     def on_draft_other_room(self, joueur, room_draftee, manoir):

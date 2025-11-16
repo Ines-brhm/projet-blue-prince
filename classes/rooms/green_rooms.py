@@ -114,6 +114,7 @@ class Cloister(BaseSalle):
             rarity=3,
         )
         self.draftable = True
+        self.rare = True
         self.border_only = True
         self._reward_done = False    # pour que l'effet ne se fasse qu'une fois
 
@@ -134,13 +135,6 @@ class Cloister(BaseSalle):
         print("🌿 Cloister : +1 Dice, +5 Gold (jardin découvert)")
 
 
-
-# classes/rooms/green_rooms.py
-from .base import BaseSalle, Dir, Door
-import os
-import random
-
-ASSETS_GREEN = os.path.join("classes", "rooms", "assets", "green")
 
 
 class Courtyard(BaseSalle):
@@ -165,6 +159,7 @@ class Courtyard(BaseSalle):
             rarity=1,      # standard
         )
         self.draftable    = True
+        self.rare = True
         self.border_only  = True
         self._loot_chance = 0.75   # 75% de chance de loot
 
@@ -216,6 +211,7 @@ class Patio(BaseSalle):
             rarity=2,
         )
         self.draftable  = True
+        self.rare = True
         self.border_only = True
         self._activated = False   # effet une seule fois
 

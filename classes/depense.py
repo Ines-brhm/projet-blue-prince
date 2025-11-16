@@ -39,7 +39,8 @@ PRODUCTS = [
     {"id":"cake",     "label":"Gâteau",   "steps":10,  "price": 7},
     {"id":"sandwich", "label":"Sandwich", "steps":15,  "price":10},
     {"id":"meal",     "label":"Repas",   "steps":25,  "price":15},
-    {"id":"detector", "label":"Détecteur de métaux", "steps": 0, "price":5}
+    {"id":"detector", "label":"Détecteur de métaux", "steps": 0, "price":5},
+    {"id":"rabbit_foot", "label":"Patte de lapin", "steps": 0, "price":8}
 ]
 
 # ---------- AFFICHAGE (overlay bloquant) ----------
@@ -66,6 +67,8 @@ def _draw_shop_overlay(fenetre, products, selected_idx, gold):
     for i, p in enumerate(products):
         if p["id"] == "detector":
           line = f"{p['label']}  —  +{p['steps']} pas   |   {p['price']} or"
+        elif p["id"] == "rabbit_foot":
+            line = f"{p['label']}  —  +{p['steps']} pas |   {p['price']} or"
         else:
             line = f"{p['label']}  —  +{p['steps']} pas   |   {p['price']} or"
         color = (235,235,240) if i != selected_idx else (120, 200, 255)
@@ -127,6 +130,9 @@ def open_shop_blocking(fenetre, inv):
                     if item["id"] == "detector" and inv.metal_detector>=1:
                         _flash_msg(fenetre, "Tu as déjà un détecteur.", (255,120,120))
                         continue
+                    if item["id"] == "rabbit_foot" and inv.rabbit_foot>=1:
+                        _flash_msg(fenetre, "Tu as déjà un pas de lapin.", (255,120,120))
+                        continue
 
                     if gold < price:
                         _flash_msg(fenetre, " Or insuffisant", (255,120,120))
@@ -137,6 +143,12 @@ def open_shop_blocking(fenetre, inv):
                             # achat du détecteur : on n'ajoute PAS de steps
                             setattr(inv, "metal_detector", 1)
                             _flash_msg(fenetre, "Détecteur acheté !", (120,255,160))
+
+                        elif item["id"] == "rabbit_foot":
+                            setattr(inv, "rabbit_foot",inv.rabbit_foot + 1)
+                            _flash_msg(fenetre, "Pas de lapin acheté !", (120,255,160))
+
+   
                         else:
                             # achat normal de nourriture = des pas
                             steps = item["steps"]
